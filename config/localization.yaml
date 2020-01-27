@@ -42,7 +42,7 @@ odom1_config: [true, # X
                false, # a_x
                false, # a_y
                false] # a_z
-odom1_differential: false
+odom1_differential: true
 odom1_queue_size: 10
 
 imu0: imu/data
