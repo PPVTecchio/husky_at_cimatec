@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="velodyned_husky">
+
+  <xacro:arg name="gpu" default="false"/>
+  <xacro:property name="gpu" value="$(arg gpu)" />
+
+  <!-- <xacro:arg name="velodyne_xyz" default="0.2206 0.0 0.00635" /> -->
+  <xacro:arg name="velodyne_xyz" default="0.0 0.0 0.05" />
+  <xacro:property name="velodyne_xyz" value="$(arg velodyne_xyz)" />
+
+  <xacro:arg name="velodyne_rpy" default="0.0 0.0 0.0" />
+  <xacro:property name="velodyne_rpy" value="$(arg velodyne_rpy)" />
+
+  <xacro:include filename="$(find velodyne_description)/urdf/VLP-16.urdf.xacro"/>
+
+  <material name="black">
+    <color rgba="0 0 0 1"/>
+  </material>
+
+  <link name="velodyne_support">
+    <visual>
+      <geometry>
+        <cylinder length="0.1" radius="0.05"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.1" radius="0.05"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+    </collision>
+  </link>
+
+  <joint name="top_plate_to_velodyne_support" type="fixed">
+    <parent link="top_plate_link"/>
+    <child link="velodyne_support"/>
+    <origin xyz="0 0 .05" rpy="0 0 0"/>
+  </joint>
+
+  <gazebo reference="velodyne_support">
+    <material>Gazebo/Black</material>
+  </gazebo>
+
+  <VLP-16 parent="velodyne_support" name="velodyne" topic="/velodyne_points" hz="10" samples="440" gpu="${gpu}">
+    <origin xyz="${velodyne_xyz}" rpy="${velodyne_rpy}" />
+  </VLP-16>
+
+
+</robot>

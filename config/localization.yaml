@@ -1,0 +1,70 @@
+odom_frame: odom
+base_link_frame: base_link
+world_frame: odom
+
+two_d_mode: false
+
+frequency: 50
+
+odom0: husky_velocity_controller/odom
+ # X,Y,Z,roll,pitch,yaw,X˙,Y˙,Z˙,roll˙,pitch˙,yaw˙,X¨,Y¨,Z¨
+odom0_config: [false, # X
+               false, # Y
+               false, # Z
+               false, # roll
+               false, # pitch
+               false, # yaw
+               true,  # vx
+               true,  # vy
+               true,  # vz
+               false, # v_roll
+               false, # v_pitch
+               true,  # v_yaw
+               false, # a_x
+               false, # a_y
+               false] # a_z
+odom0_differential: false
+odom0_queue_size: 10
+
+odom1: laser_odom_to_init
+odom1_config: [true, # X
+               true, # Y
+               true, # Z
+               true, # roll
+               true, # pitch
+               true, # yaw
+               false,  # vx
+               false,  # vy
+               false,  # vz
+               false, # v_roll
+               false, # v_pitch
+               false,  # v_yaw
+               false, # a_x
+               false, # a_y
+               false] # a_z
+odom1_differential: false
+odom1_queue_size: 10
+
+imu0: imu/data
+imu0_config: [false, # X
+              false, # Y
+              false, # Z
+
+              true, # roll
+              true, # pitch
+              true, # yaw
+
+              false,  # vx
+              false,  # vy
+              false,  # vz
+
+              true, # v_roll
+              true, # v_pitch
+              true,  # v_yaw
+
+              false, # a_x
+              false, # a_y
+              false] # a_z
+imu0_differential: true
+imu0_queue_size: 10
+imu0_remove_gravitational_acceleration: true
