@@ -8,6 +8,7 @@ Panels:
         - /Status1
         - /odometry1
         - /odometry1/ALOAMOdom1/Shape1
+        - /Marker1
       Splitter Ratio: 0.5
     Tree Height: 555
   - Class: rviz/Selection
@@ -812,9 +813,6 @@ Visualization Manager:
       Show Names: true
       Tree:
         map:
-          camera_init:
-            aft_mapped:
-              {}
           odom:
             base_link:
               base_footprint:
@@ -847,6 +845,9 @@ Visualization Manager:
                     velodyne:
                       {}
               user_rail_link:
+                {}
+            camera_init:
+              aft_mapped:
                 {}
       Update Interval: 0
       Value: true
@@ -981,6 +982,24 @@ Visualization Manager:
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
+    - Alpha: 0.699999988079071
+      Class: rviz/Map
+      Color Scheme: map
+      Draw Behind: false
+      Enabled: true
+      Name: Map
+      Topic: /map
+      Unreliable: false
+      Use Timestamp: false
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /exploration_polygon_marker
+      Name: Marker
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 0; 0; 0
@@ -1009,7 +1028,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/XYOrbit
-      Distance: 20.114152908325195
+      Distance: 55.77813720703125
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1

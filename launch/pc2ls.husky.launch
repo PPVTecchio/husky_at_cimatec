@@ -6,18 +6,18 @@
 
     <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan">
 
-        <remap from="cloud_in" to="/velodyne_points"/>
+        <remap from="cloud_in" to="velodyne_points"/>
         <remap from="scan" to="scan"/>
         <rosparam>
-            target_frame: camera_init # Leave disabled to output scan in pointcloud frame
+            target_frame: velodyne_base_link # Leave disabled to output scan in pointcloud frame
             transform_tolerance: 0.01
-            min_height: -.1
+            min_height: -0.4
             max_height: 3.0
 
-            angle_min: -M_PI/2
-            angle_max: M_PI/2
-            angle_increment: M_PI/720.0
-            scan_time: 0.3333
+            angle_min: -M_PI
+            angle_max: M_PI
+            angle_increment: M_PI/360.0
+            scan_time: 0.1
             range_min: 0.45
             range_max: 100.0
             use_inf: true

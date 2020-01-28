@@ -28,6 +28,6 @@
 
   <include file="$(find husky)/launch/gmapping.husky.launch" />
 
-  <!-- <rosparam command="load" file="$(find husky)/config/localization.yaml" /> -->
+  <!-- <include file="$(find husky)/launch/exploration.husky.launch" /> -->
 
 </launch>

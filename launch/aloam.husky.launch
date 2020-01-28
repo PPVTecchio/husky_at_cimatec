@@ -21,8 +21,8 @@
 
   <node pkg="tf"
     type="static_transform_publisher"
-    name="map_to_camera_init"
-    args="0 0 0 0 0 0 map camera_init 100" />
+    name="odom_to_camera_init"
+    args="0 0 0 0 0 0 odom camera_init 100" />
 
 
   <!-- <arg name="rviz" default="true" />
