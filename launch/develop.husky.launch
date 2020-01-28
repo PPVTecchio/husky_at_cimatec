@@ -15,7 +15,7 @@
 
   <include file="$(find husky)/launch/teleop.husky.launch" />
   <include file="$(find husky)/launch/rviz.husky.launch" />
-  <include file="$(find husky)/launch/aloam.husky.launch" />
+  <!-- <include file="$(find husky)/launch/aloam.husky.launch" /> -->
   <!-- <include file="$(find husky)/launch/loam.husky.launch">
     <arg name="rviz" value="true"/>
   </include> -->
@@ -29,5 +29,7 @@
   <include file="$(find husky)/launch/gmapping.husky.launch" />
 
   <!-- <include file="$(find husky)/launch/exploration.husky.launch" /> -->
+
+  <!-- <include file="$(find husky)/launch/nav2d.husky.launch" /> -->
 
 </launch>

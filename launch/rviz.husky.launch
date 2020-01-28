@@ -1,4 +1,4 @@
 <?xml version="1.0"?>
 <launch>
-  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find husky)/config/config.rviz" output="screen"/>
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find husky)/config/config_no_aloam.rviz" output="screen"/>
 </launch>

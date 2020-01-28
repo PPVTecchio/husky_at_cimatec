@@ -8,7 +8,7 @@
       base_frame: base_link
       map_frame: map
 
-      map_update_interval: 0.5 # Publish new map
+      map_update_interval: 1.0 # Publish new map
 
       maxUrange: 99 # Should be just less than sensor range
       maxRange: 101 # Should be just greater than sensor range

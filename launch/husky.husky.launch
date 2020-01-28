@@ -13,12 +13,9 @@
     <arg name="urdf_extras" value="$(arg urdf_extras)"/>
   </include>
 
-  <include file="$(find husky)/launch/teleop.husky.launch" />
+  <!-- <include file="$(find husky)/launch/teleop.husky.launch" /> -->
   <include file="$(find husky)/launch/rviz.husky.launch" />
-  <include file="$(find husky)/launch/aloam.husky.launch" />
-  <!-- <include file="$(find husky)/launch/loam.husky.launch">
-    <arg name="rviz" value="true"/>
-  </include> -->
+  <!-- <include file="$(find husky)/launch/aloam.husky.launch" /> -->
   <include file="$(find husky)/launch/pc2ls.husky.launch" />
 
 
@@ -28,6 +25,6 @@
 
   <include file="$(find husky)/launch/gmapping.husky.launch" />
 
-  <!-- <rosparam command="load" file="$(find husky)/config/localization.yaml" /> -->
+  <include file="$(find husky)/launch/nav2d.husky.launch" />
 
 </launch>
