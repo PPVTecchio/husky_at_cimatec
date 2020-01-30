@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="camera_husky">
+
+  <xacro:arg name="camera_xyz" default="0.0 0.0 0.05" />
+  <xacro:property name="camera_xyz" value="$(arg camera_xyz)" />
+
+  <xacro:arg name="camera_rpy" default="0.0 0.0 0.0" />
+  <xacro:property name="camera_rpy" value="$(arg camera_rpy)" />
+
+  <xacro:include filename="$(find husky)/urdf/GenericCamera.xacro"/>
+
+  <material name="camera_support_black">
+    <color rgba="0 0 0 1"/>
+  </material>
+
+  <link name="camera_support">
+    <visual>
+      <geometry>
+        <cylinder length="0.05" radius="0.03"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="camera_support_black"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.05" radius="0.03"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+    </collision>
+  </link>
+
+  <joint name="top_plate_to_camera_support" type="fixed">
+    <parent link="top_plate_link"/>
+    <child link="camera_support"/>
+    <origin xyz="0.25 0 .025" rpy="0 0 0"/>
+  </joint>
+
+  <gazebo reference="camera_support">
+    <material>Gazebo/Black</material>
+  </gazebo>
+
+  <GenericCamera parent="camera_support">
+    <origin xyz="${camera_xyz}" rpy="${camera_rpy}" />
+  </GenericCamera>
+
+
+</robot>

@@ -10,22 +10,22 @@
 
       map_update_interval: 1.0 # Publish new map
 
-      maxUrange: 99 # Should be just less than sensor range
-      maxRange: 101 # Should be just greater than sensor range
-      particles: 100 # Increased from 80
+      maxUrange: 30 # Should be just less than sensor range
+      maxRange: 32 # Should be just greater than sensor range
+      particles: 40 # Increased from 80
 
       # Update frequencies
       linearUpdate: 0.3
-      angularUpdate: 0.5
+      angularUpdate: 0.25
       temporalUpdate: 2.0
       resampleThreshold: 0.5
 
       # Initial Map Size
-      xmin: -100.0
-      ymin: -100.0
-      xmax: 100.0
-      ymax: 100.0
-      delta: 0.05
+      xmin: -116.0
+      ymin: -55.0
+      xmax: 14.0
+      ymax: 35.0
+      delta: 0.1
 
       # All default
       sigma: 0.05

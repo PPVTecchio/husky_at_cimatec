@@ -2,7 +2,7 @@
 
   <arg name="laser_enabled" default="false"/>
   <arg name="kinect_enabled" default="false"/>
-  <arg name="urdf_extras" default="$(find husky)/urdf/velodyned.husky.xacro"/>
+  <arg name="urdf_extras" default="$(find husky)/urdf/addons.husky.xacro"/>
 
 
   <include file="$(find bir_cimatec4_map)/launch/gazebo.launch" />
@@ -11,10 +11,14 @@
     <arg name="laser_enabled" value="$(arg laser_enabled)"/>
     <arg name="kinect_enabled" value="$(arg kinect_enabled)"/>
     <arg name="urdf_extras" value="$(arg urdf_extras)"/>
+    <arg name="x" value="51"/>
+    <arg name="y" value="10"/>
+    <arg name="z" value="0.5"/>
+    <arg name="yaw" value="3.14159"/>
   </include>
 
   <!-- <include file="$(find husky)/launch/teleop.husky.launch" /> -->
-  <include file="$(find husky)/launch/rviz.husky.launch" />
+  <!-- <include file="$(find husky)/launch/rviz.husky.launch" /> -->
   <!-- <include file="$(find husky)/launch/aloam.husky.launch" /> -->
   <include file="$(find husky)/launch/pc2ls.husky.launch" />
 
@@ -23,8 +27,8 @@
     <arg name="no_static_map" value="true"/>
   </include>
 
-  <include file="$(find husky)/launch/gmapping.husky.launch" />
+  <!-- <include file="$(find husky)/launch/gmapping.husky.launch" /> -->
 
-  <include file="$(find husky)/launch/nav2d.husky.launch" />
+  <!-- <include file="$(find husky)/launch/nav2d.husky.launch" /> -->
 
 </launch>

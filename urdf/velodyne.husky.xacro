@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="velodyned_husky">
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="velodyne_husky">
 
   <xacro:arg name="gpu" default="false"/>
   <xacro:property name="gpu" value="$(arg gpu)" />
@@ -13,7 +13,7 @@
 
   <xacro:include filename="$(find velodyne_description)/urdf/VLP-16.urdf.xacro"/>
 
-  <material name="black">
+  <material name="velodyne_support_black">
     <color rgba="0 0 0 1"/>
   </material>
 
@@ -23,7 +23,7 @@
         <cylinder length="0.1" radius="0.05"/>
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 0"/>
-      <material name="black"/>
+      <material name="velodyne_support_black"/>
     </visual>
     <collision>
       <geometry>

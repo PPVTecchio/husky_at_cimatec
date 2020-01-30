@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="GenericCamera">
+
+  <xacro:property name="M_PI" value="3.1415926535897931" />
+  <xacro:property name="camera_size" value="0.05" />
+
+  <xacro:macro name="GenericCamera" params="*origin
+  parent:=base_link name:=camera topic:=/camera hz:=30
+  fov:=${M_PI/2.0} px_width:=1280 px_heigth:=720 px_format:=R8G8B8
+  clip_near:=0.02 clip_far:=300 noise:=0.008">
+
+    <joint name="${name}_joint" type="fixed">
+      <axis xyz="0 1 0" />
+      <xacro:insert_block name="origin"/>
+      <parent link="${parent}"/>
+      <child link="${name}_link"/>
+    </joint>
+
+    <material name="generic_camera_red">
+      <color rgba="1 0 0 1"/>
+    </material>
+
+    <link name="${name}_link">
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+      <box size="${camera_size / 2.0} ${camera_size} ${camera_size}"/>
+        </geometry>
+      </collision>
+
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+      <box size="${camera_size / 2.0} ${camera_size} ${camera_size}"/>
+        </geometry>
+        <material name="generic_camera_red"/>
+      </visual>
+
+      <inertial>
+        <mass value="0.1" />
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+      </inertial>
+    </link>
+
+    <gazebo reference="${name}_link">
+      <material>Gazebo/Red</material>
+    </gazebo>
+
+
+    <gazebo reference="${name}_link">
+      <sensor type="camera" name="${name}_sensor">
+        <update_rate>${hz}</update_rate>
+        <camera name="${name}">
+          <horizontal_fov>${fov}</horizontal_fov>
+          <image>
+            <width>${px_width}</width>
+            <height>${px_heigth}</height>
+            <format>${px_format}</format>
+          </image>
+          <clip>
+            <near>${clip_near}</near>
+            <far>${clip_far}</far>
+          </clip>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>${noise}</stddev>
+          </noise>
+        </camera>
+        <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+          <alwaysOn>true</alwaysOn>
+          <updateRate>0.0</updateRate>
+          <cameraName>${name}</cameraName>
+          <imageTopicName>image_raw</imageTopicName>
+          <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+          <frameName>${name}_link</frameName>
+          <hackBaseline>0.07</hackBaseline>
+          <distortionK1>0.0</distortionK1>
+          <distortionK2>0.0</distortionK2>
+          <distortionK3>0.0</distortionK3>
+          <distortionT1>0.0</distortionT1>
+          <distortionT2>0.0</distortionT2>
+        </plugin>
+      </sensor>
+    </gazebo>
+
+  </xacro:macro>
+</robot>
