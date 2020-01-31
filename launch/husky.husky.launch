@@ -18,7 +18,7 @@
   </include>
 
   <!-- <include file="$(find husky)/launch/teleop.husky.launch" /> -->
-  <!-- <include file="$(find husky)/launch/rviz.husky.launch" /> -->
+  <include file="$(find husky)/launch/rviz.husky.launch" />
   <!-- <include file="$(find husky)/launch/aloam.husky.launch" /> -->
   <include file="$(find husky)/launch/pc2ls.husky.launch" />
 
