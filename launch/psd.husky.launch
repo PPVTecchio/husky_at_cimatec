@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<launch>
+  <node name="pcl_sphere_detector" pkg="pcl_sphere_detector" type="pcl_sphere_detector" output="screen"/>
+</launch>

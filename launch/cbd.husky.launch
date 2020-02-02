@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<launch>
+  <node name="colored_ball_detector" pkg="colored_ball_detector" type="colored_ball_detector" output="screen"/>
+</launch>

@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="camera_husky">
+  <xacro:property name="M_PI" value="3.1415926535897931" />
 
   <xacro:arg name="camera_xyz" default="0.0 0.0 0.05" />
   <xacro:property name="camera_xyz" value="$(arg camera_xyz)" />
@@ -40,7 +41,7 @@
   </gazebo>
 
   <GenericCamera parent="camera_support">
-    <origin xyz="${camera_xyz}" rpy="${camera_rpy}" />
+    <origin xyz="${camera_xyz}" rpy="${camera_rpy}" fov="${M_PI/1.5}" />
   </GenericCamera>
 
 
