@@ -14,11 +14,11 @@ topics:
 - name    : external
   topic   : cmd_vel_nav2d
   timeout : 0.5
-  priority: 2
+  priority: 5
 - name    : external
   topic   : cmd_vel_move_base
   timeout : 0.5
-  priority: 5
+  priority: 15
 locks:
 - name    : e_stop
   topic   : e_stop

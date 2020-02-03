@@ -68,7 +68,7 @@ Control::Control() {
                          &Control::odomCB,
                          this);
   pubPoseStamped = nh_.advertise<geometry_msgs::PoseStamped>
-    ("move_base_simple/goal", 1);
+    ("goal", 1);
 
   startClient = nh_.serviceClient<std_srvs::Trigger>("StartExploration");
   stopClient = nh_.serviceClient<std_srvs::Trigger>("Stop");
@@ -139,9 +139,11 @@ bool Control::findBall(void) {
   double x , y;
   std_msgs::Header outputHeaderMsg;
   geometry_msgs::PoseStamped outputPoseStampedMsg;
-  tf2::Quaternion odomQ;
-  tf2::Quaternion cbdQ;
-  tf2::Quaternion q;
+  tf::Quaternion odomQ;
+  tf::Quaternion cbdQ;
+  tf::Quaternion q;
+  tf::Matrix3x3* m;
+  double roll, pitch, yaw, r;
 
 
   switch (robotState) {
@@ -165,8 +167,6 @@ bool Control::findBall(void) {
     if (cbdState) {
       ROS_INFO_STREAM("Robot found ball using CBD!");
       robotState = 2;
-
-      time_old = ros::Time::now();
     }
     break;
   case 2:
@@ -184,16 +184,19 @@ bool Control::findBall(void) {
     outputHeaderMsg.stamp = ros::Time::now();
     outputHeaderMsg.frame_id = odomH.frame_id;
 
-    x = odomP.pose.position.x + 1 * cos(cbdP.z);
-    y = odomP.pose.position.y + 1 * sin(cbdP.z);
     cbdQ.setRPY(0, 0, cbdP.z);
-    // tf2::convert(odomP.pose.orientation, odomQ);
     odomQ.setW(odomP.pose.orientation.w);
     odomQ.setX(odomP.pose.orientation.x);
     odomQ.setY(odomP.pose.orientation.y);
     odomQ.setZ(odomP.pose.orientation.z);
     q = cbdQ * odomQ;
     q.normalize();
+
+    m = new tf::Matrix3x3(q);
+    m->getRPY(roll, pitch, yaw);
+
+    x = odomP.pose.position.x + 2 * cos(yaw);
+    y = odomP.pose.position.y + 2 * sin(yaw);
 
     outputPoseStampedMsg.header = outputHeaderMsg;
     outputPoseStampedMsg.pose.position.x = x;
@@ -208,9 +211,56 @@ bool Control::findBall(void) {
 
     ROS_INFO_STREAM("Goal msg: " << outputPoseStampedMsg);
 
-    robotState = 4;
+    if (psdState)
+      robotState = 4;
+    else
+      robotState = 3;
     break;
   case 4:
+    ROS_INFO_STREAM("Robot PSD moving robot!");
+    outputHeaderMsg.seq = odomH.seq;
+    outputHeaderMsg.stamp = ros::Time::now();
+    outputHeaderMsg.frame_id = odomH.frame_id;
+
+    cbdQ.setRPY(0, 0, cbdP.z);
+    odomQ.setW(odomP.pose.orientation.w);
+    odomQ.setX(odomP.pose.orientation.x);
+    odomQ.setY(odomP.pose.orientation.y);
+    odomQ.setZ(odomP.pose.orientation.z);
+    q = cbdQ * odomQ;
+    q.normalize();
+
+    m = new tf::Matrix3x3(q);
+    m->getRPY(roll, pitch, yaw);
+
+    r = sqrt(psdP.x * psdP.x + psdP.y * psdP.y);
+
+    if (r > 3) {
+      robotState = 3;
+      break;
+    }
+
+    if (r > 1.5)
+      r -= 1;
+
+    x = odomP.pose.position.x + r * cos(yaw);
+    y = odomP.pose.position.y + r * sin(yaw);
+
+    outputPoseStampedMsg.header = outputHeaderMsg;
+    outputPoseStampedMsg.pose.position.x = x;
+    outputPoseStampedMsg.pose.position.y = y;
+    outputPoseStampedMsg.pose.position.z = odomP.pose.position.z;
+    outputPoseStampedMsg.pose.orientation = odomP.pose.orientation;
+    pubPoseStamped.publish(outputPoseStampedMsg);
+
+    ROS_INFO_STREAM("Goal msg: " << outputPoseStampedMsg);
+
+    if (r > 1.5)
+      robotState = 4;
+    else
+      robotState = 5;
+    break;
+  case 5:
     return 1;
     // break;
 
