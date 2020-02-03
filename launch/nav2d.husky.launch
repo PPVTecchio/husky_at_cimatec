@@ -9,6 +9,7 @@
 		<remap from="scan" to="scan"/>
 		<rosparam file="$(find husky)/param/operator.yaml"/>
 		<rosparam file="$(find husky)/param/costmap.yaml" ns="local_map" />
+		<remap from="cmd_vel" to="cmd_vel_nav2d"/>
 	</node>
 
 	<!-- Start Mapper to genreate map from laser scans -->

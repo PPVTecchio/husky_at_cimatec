@@ -40,6 +40,7 @@ class Control {
   ros::ServiceClient stopClient;
   ros::ServiceClient startClient;
   std_srvs::Trigger trigger;
+  ros::Time time_old;
 
   void cbdCB(const geometry_msgs::PointStamped& msg);
   void psdCB(const geometry_msgs::PointStamped& msg);
@@ -50,7 +51,7 @@ class Control {
   ~Control();
   void startExploration();
   void stop(void);
-  void findBall(void);
+  bool findBall(void);
 };
 
 Control::Control() {
@@ -67,7 +68,7 @@ Control::Control() {
                          &Control::odomCB,
                          this);
   pubPoseStamped = nh_.advertise<geometry_msgs::PoseStamped>
-    ("goal", 1);
+    ("move_base_simple/goal", 1);
 
   startClient = nh_.serviceClient<std_srvs::Trigger>("StartExploration");
   stopClient = nh_.serviceClient<std_srvs::Trigger>("Stop");
@@ -124,6 +125,7 @@ void Control::odomCB(const nav_msgs::Odometry& msg) {
 void Control::startExploration(void) {
   // gExploreClient->sendGoal(exploreGoal);
   startClient.call(trigger);
+  ROS_INFO_STREAM("Iniciou");
   explorationState = true;
 }
 
@@ -133,7 +135,7 @@ void Control::stop(void) {
 }
 
 
-void Control::findBall(void) {
+bool Control::findBall(void) {
   double x , y;
   std_msgs::Header outputHeaderMsg;
   geometry_msgs::PoseStamped outputPoseStampedMsg;
@@ -160,29 +162,21 @@ void Control::findBall(void) {
     robotState = 1;
     break;
   case 1:
-    // ROS_INFO_STREAM("Robot is looking for ball!");
-    // if (cbdState && psdState) {
-    //   ROS_INFO_STREAM("Robot found ball using CBD and PSD!");
-    //   robotState = 2;
-    // } else
     if (cbdState) {
       ROS_INFO_STREAM("Robot found ball using CBD!");
-      robotState = 3;
+      robotState = 2;
+
+      time_old = ros::Time::now();
     }
-    // else if (psdState) {
-    //   ROS_INFO_STREAM("Robot found ball using PSD!");
-    //   robotState = 4;
-    // } else {
-    //   robotState = 1;
-    // }
     break;
   case 2:
-    if (explorationState)
+    if (explorationState) {
       stop();
+      ROS_INFO_STREAM("Send stop signal!");
+      robotState = 3;
+    }
     break;
   case 3:
-    if (explorationState)
-      stop();
     cbdState = false;
 
     ROS_INFO_STREAM("Robot CBD moving robot!");
@@ -212,27 +206,28 @@ void Control::findBall(void) {
     outputPoseStampedMsg.pose.orientation.z = q.getZ();
     pubPoseStamped.publish(outputPoseStampedMsg);
 
+    ROS_INFO_STREAM("Goal msg: " << outputPoseStampedMsg);
 
-    robotState = 1;
+    robotState = 4;
     break;
   case 4:
-    if (explorationState)
-      stop();
-    break;
+    return 1;
+    // break;
 
   default:
     break;
   }
+  return 0;
 }
 
 int main(int argc, char** argv) {
   ros::init(argc, argv, "control");
   Control control;
-  control.startExploration();
   while (ros::ok) {
-    control.findBall();
+    if (control.findBall())
+      break;
     ros::spinOnce();
   }
-
+  ros::shutdown();
   return 0;
 }
