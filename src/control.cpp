@@ -33,6 +33,7 @@ class Control {
   geometry_msgs::Point cbdP;
   geometry_msgs::Point psdP;
   geometry_msgs::PoseWithCovariance odomP;
+  geometry_msgs::PoseStamped oldPoseMsg;
   bool cbdState;
   bool psdState;
   bool explorationState;
@@ -145,6 +146,7 @@ bool Control::findBall(void) {
   tf::Matrix3x3* m;
   double roll, pitch, yaw, r;
   double alpha = 0;
+  double deltaPose;
 
 
   switch (robotState) {
@@ -175,10 +177,17 @@ bool Control::findBall(void) {
       stop();
       ROS_INFO_STREAM("Send stop signal!");
       robotState = 3;
+      oldPoseMsg.pose = odomP.pose;
     }
     break;
   case 3:
     cbdState = false;
+
+    // deltaPose = sqrt(
+    //   pow(oldPoseMsg.pose.position.x - odomP.pose.position.x, 2) +
+    //   pow(oldPoseMsg.pose.position.y - odomP.pose.position.y, 2));
+
+    // if (deltaPose < 0.5) {
 
     ROS_INFO_STREAM("Robot CBD moving robot!");
     outputHeaderMsg.seq = odomH.seq;
@@ -196,10 +205,13 @@ bool Control::findBall(void) {
     m = new tf::Matrix3x3(q);
     m->getRPY(roll, pitch, yaw);
 
-    alpha = (0.25 - cbdP.x) / 0.25;
+    // alpha = (0.25 - cbdP.x) / 0.25;
 
-    x = odomP.pose.position.x + alpha * 1 * cos(yaw);
-    y = odomP.pose.position.y + alpha * 1 * sin(yaw);
+    // x = odomP.pose.position.x + alpha * 1 * cos(yaw);
+    // y = odomP.pose.position.y + alpha * 1 * sin(yaw);
+
+    x = odomP.pose.position.x + 1 * cos(yaw);
+    y = odomP.pose.position.y + 1 * sin(yaw);
 
     outputPoseStampedMsg.header = outputHeaderMsg;
     outputPoseStampedMsg.pose.position.x = x;
@@ -212,17 +224,19 @@ bool Control::findBall(void) {
     outputPoseStampedMsg.pose.orientation.z = q.getZ();
     pubPoseStamped.publish(outputPoseStampedMsg);
 
+    oldPoseMsg = outputPoseStampedMsg;
+
     ROS_INFO_STREAM("Goal msg: " << outputPoseStampedMsg);
-
-    if (cbdP.x > 0.3)
-      robotState = 5;
-    else
-      robotState = 3;
-
-    // if (psdState)
-    //   robotState = 4;
+  // }
+    // if (cbdP.x > 0.3)
+    //   robotState = 5;
     // else
     //   robotState = 3;
+
+    if (psdState)
+      robotState = 4;
+    else
+      robotState = 3;
     break;
   case 4:
     ROS_INFO_STREAM("Robot PSD moving robot!");
@@ -243,12 +257,12 @@ bool Control::findBall(void) {
 
     r = sqrt(psdP.x * psdP.x + psdP.y * psdP.y);
 
-    if (r > 3) {
+    if (r > 7) {
       robotState = 3;
       break;
     }
 
-    if (r > 1.5)
+    if (r > 2)
       r -= 1;
 
     x = odomP.pose.position.x + r * cos(yaw);
@@ -263,7 +277,7 @@ bool Control::findBall(void) {
 
     ROS_INFO_STREAM("Goal msg: " << outputPoseStampedMsg);
 
-    if (r > 1.5)
+    if (r > 2)
       robotState = 4;
     else
       robotState = 5;

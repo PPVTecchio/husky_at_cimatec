@@ -43,7 +43,7 @@
     <material>Gazebo/Black</material>
   </gazebo>
 
-  <VLP-16 parent="velodyne_support" name="velodyne" topic="/velodyne_points" hz="5" samples="2000" gpu="${gpu}" max_range="105">
+  <VLP-16 parent="velodyne_support" name="velodyne" topic="/velodyne_points" hz="5" samples="1000" gpu="${gpu}" max_range="105">
     <origin xyz="${velodyne_xyz}" rpy="${velodyne_rpy}" />
   </VLP-16>
 
