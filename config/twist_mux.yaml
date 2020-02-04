@@ -7,17 +7,17 @@ topics:
   topic   : twist_marker_server/cmd_vel
   timeout : 0.5
   priority: 8
-- name    : external
+- name    : cmd_vel
   topic   : cmd_vel
   timeout : 0.5
   priority: 1
-- name    : external
+- name    : cmd_vel_nav2d
   topic   : cmd_vel_nav2d
-  timeout : 0.5
+  timeout : 0.2
   priority: 5
-- name    : external
+- name    : cmd_vel_move_base
   topic   : cmd_vel_move_base
-  timeout : 0.5
+  timeout : 1.0
   priority: 15
 locks:
 - name    : e_stop

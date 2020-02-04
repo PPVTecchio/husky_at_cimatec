@@ -6,18 +6,12 @@
 #include <geometry_msgs/PointStamped.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <nav_msgs/Odometry.h>
-
-
-#include <actionlib/client/simple_action_client.h>
-#include <nav2d_navigator/ExploreAction.h>
-#include <nav2d_navigator/MoveToPosition2DAction.h>
 #include <std_srvs/Trigger.h>
-#include <nav2d_navigator/RobotNavigator.h>
-
-#include <nav2d_navigator/commands.h>
-
 #include <tf2/LinearMath/Quaternion.h>
 
+
+#include <nav2d_navigator/RobotNavigator.h>
+#include <nav2d_navigator/commands.h>
 
 class Control {
   ros::NodeHandle nh_;
@@ -31,7 +25,7 @@ class Control {
   geometry_msgs::Point cbdP;
   geometry_msgs::Point psdP;
   geometry_msgs::PoseWithCovariance odomP;
-  geometry_msgs::PoseStamped oldPoseMsg;
+  geometry_msgs::Pose2D desiredPose;
   bool cbdState;
   bool psdState;
   bool explorationState;
@@ -39,7 +33,6 @@ class Control {
   ros::ServiceClient stopClient;
   ros::ServiceClient startClient;
   std_srvs::Trigger trigger;
-  ros::Time time_old;
 
   void cbdCB(const geometry_msgs::PointStamped& msg);
   void psdCB(const geometry_msgs::PointStamped& msg);
@@ -67,7 +60,7 @@ Control::Control() {
                          &Control::odomCB,
                          this);
   pubPoseStamped = nh_.advertise<geometry_msgs::PoseStamped>
-    ("goal", 1);
+    ("move_base_simple/goal", 1);
 
   startClient = nh_.serviceClient<std_srvs::Trigger>("StartExploration");
   stopClient = nh_.serviceClient<std_srvs::Trigger>("Stop");
@@ -121,7 +114,6 @@ void Control::odomCB(const nav_msgs::Odometry& msg) {
 
 
 void Control::startExploration(void) {
-  // gExploreClient->sendGoal(exploreGoal);
   startClient.call(trigger);
   ROS_INFO_STREAM("Iniciou");
   explorationState = true;
@@ -132,7 +124,6 @@ void Control::stop(void) {
   explorationState = false;
 }
 
-
 bool Control::findBall(void) {
   double x , y;
   std_msgs::Header outputHeaderMsg;
@@ -142,10 +133,9 @@ bool Control::findBall(void) {
   tf::Quaternion q;
   tf::Matrix3x3* m;
   double roll, pitch, yaw, r;
-  double alpha = 0;
-  double deltaPose;
+  double error;
 
-
+  ROS_INFO_STREAM("RobotState: " << robotState);
   switch (robotState) {
   case 0:
     cbdP.x = 0.0;
@@ -164,45 +154,32 @@ bool Control::findBall(void) {
     robotState = 1;
     break;
   case 1:
-    if (cbdState) {
-      ROS_INFO_STREAM("Robot found ball using CBD!");
-      robotState = 2;
+    if (!isnan(odomP.pose.position.x)) {
+      if (psdState) {
+        ROS_INFO_STREAM("Robot found ball using PSD!");
+        robotState = 6;
+        break;
+      }
+      if (cbdState) {
+        ROS_INFO_STREAM("Robot found ball using CBD!");
+        robotState = 2;
+        break;
+      }
     }
-    // if (psdState)
-    //   robotS
     break;
   case 2:
     if (explorationState) {
       stop();
-      ROS_INFO_STREAM("Send stop signal!");
-      robotState = 3;
-      oldPoseMsg.pose = odomP.pose;
+      ROS_INFO_STREAM("CBD Send stop signal!");
     }
+    robotState = 3;
+
     break;
   case 3:
-    cbdState = false;
-
-    // deltaPose = sqrt(
-    //   pow(oldPoseMsg.pose.position.x - odomP.pose.position.x, 2) +
-    //   pow(oldPoseMsg.pose.position.y - odomP.pose.position.y, 2));
-
-    // if (deltaPose < 0.5) {
-
     ROS_INFO_STREAM("Robot CBD moving robot!");
     outputHeaderMsg.seq = odomH.seq;
     outputHeaderMsg.stamp = ros::Time::now();
     outputHeaderMsg.frame_id = odomH.frame_id;
-
-    if (cbdP.z > 0)
-      cbdP.z = std::min(cbdP.z, M_PI * 10/180);
-    else
-      cbdP.z = std::max(cbdP.z, - M_PI * 10/180);
-
-    // if (abs(cbdP.z) > M_PI * 15 / 180) {
-    //   robotState = 1;
-    //   startExploration();
-    //   break;
-    // }
 
     cbdQ.setRPY(0, 0, cbdP.z);
     odomQ.setW(odomP.pose.orientation.w);
@@ -215,17 +192,13 @@ bool Control::findBall(void) {
     m = new tf::Matrix3x3(q);
     m->getRPY(roll, pitch, yaw);
 
-    // alpha = (0.25 - cbdP.x) / 0.25;
-
-    // x = odomP.pose.position.x + alpha * 1 * cos(yaw);
-    // y = odomP.pose.position.y + alpha * 1 * sin(yaw);
-
-    x = odomP.pose.position.x + 2 * cos(yaw);
-    y = odomP.pose.position.y + 2 * sin(yaw);
+    desiredPose.theta = yaw;
+    desiredPose.x = odomP.pose.position.x + cbdP.x * cos(yaw);
+    desiredPose.y = odomP.pose.position.y + cbdP.x * sin(yaw);
 
     outputPoseStampedMsg.header = outputHeaderMsg;
-    outputPoseStampedMsg.pose.position.x = x;
-    outputPoseStampedMsg.pose.position.y = y;
+    outputPoseStampedMsg.pose.position.x = desiredPose.x;
+    outputPoseStampedMsg.pose.position.y = desiredPose.y;
     outputPoseStampedMsg.pose.position.z = odomP.pose.position.z;
     // tf2::convert(q, outputPoseStampedMsg.pose.orientation);
     outputPoseStampedMsg.pose.orientation.w = q.getW();
@@ -234,27 +207,14 @@ bool Control::findBall(void) {
     outputPoseStampedMsg.pose.orientation.z = q.getZ();
     pubPoseStamped.publish(outputPoseStampedMsg);
 
-    oldPoseMsg = outputPoseStampedMsg;
-
-    ROS_INFO_STREAM("Goal msg: " << outputPoseStampedMsg);
-  // }
-    // if (cbdP.x > 0.3)
-    //   robotState = 5;
-    // else
-    //   robotState = 3;
-
-    if (psdState)
-      robotState = 4;
-    else
-      robotState = 3;
+    robotState = 7;
+    cbdState = false;
     break;
   case 4:
     ROS_INFO_STREAM("Robot PSD moving robot!");
     outputHeaderMsg.seq = odomH.seq;
     outputHeaderMsg.stamp = ros::Time::now();
     outputHeaderMsg.frame_id = odomH.frame_id;
-
-
 
     cbdQ.setRPY(0, 0, atan2(psdP.y, psdP.x));
     odomQ.setW(odomP.pose.orientation.w);
@@ -269,13 +229,9 @@ bool Control::findBall(void) {
 
     r = sqrt(psdP.x * psdP.x + psdP.y * psdP.y);
 
-    // if (r > 7) {
-    //   robotState = 3;
-    //   break;
-    // }
-
-    if (r > 2.5)
-      r -= 1;
+    r -= 1.5;
+    if (r < 1.5)
+      r = 0;
 
     x = odomP.pose.position.x + r * cos(yaw);
     y = odomP.pose.position.y + r * sin(yaw);
@@ -287,16 +243,30 @@ bool Control::findBall(void) {
     outputPoseStampedMsg.pose.orientation = odomP.pose.orientation;
     pubPoseStamped.publish(outputPoseStampedMsg);
 
-    ROS_INFO_STREAM("Goal msg: " << outputPoseStampedMsg);
+    robotState = 5;
 
-    if (r > 2.5)
-      robotState = 4;
-    else
-      robotState = 5;
+    psdState = false;
     break;
   case 5:
     return 1;
     // break;
+  case 6:
+    if (explorationState) {
+      stop();
+      ROS_INFO_STREAM("PSD Send stop signal!");
+    }
+      robotState = 4;
+    break;
+  case 7:
+    error  = std::pow(desiredPose.x - odomP.pose.position.x, 2);
+    error += std::pow(desiredPose.y - odomP.pose.position.y, 2);
+    error = sqrt(error);
+
+    if (error < 0.5)
+      robotState = 1;
+    else
+      robotState = 7;
+    break;
 
   default:
     break;

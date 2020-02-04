@@ -41,7 +41,7 @@
   </gazebo>
 
   <GenericCamera parent="camera_support">
-    <origin xyz="${camera_xyz}" rpy="${camera_rpy}" fov="${M_PI/1.5}" />
+    <origin xyz="${camera_xyz}" rpy="${camera_rpy}" fov="${M_PI/3}" />
   </GenericCamera>
 
 
