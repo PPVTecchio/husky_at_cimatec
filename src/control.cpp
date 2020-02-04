@@ -220,8 +220,8 @@ bool Control::findBall(void) {
     // x = odomP.pose.position.x + alpha * 1 * cos(yaw);
     // y = odomP.pose.position.y + alpha * 1 * sin(yaw);
 
-    x = odomP.pose.position.x + 1 * cos(yaw);
-    y = odomP.pose.position.y + 1 * sin(yaw);
+    x = odomP.pose.position.x + 2 * cos(yaw);
+    y = odomP.pose.position.y + 2 * sin(yaw);
 
     outputPoseStampedMsg.header = outputHeaderMsg;
     outputPoseStampedMsg.pose.position.x = x;
@@ -254,7 +254,9 @@ bool Control::findBall(void) {
     outputHeaderMsg.stamp = ros::Time::now();
     outputHeaderMsg.frame_id = odomH.frame_id;
 
-    cbdQ.setRPY(0, 0, cbdP.z);
+
+
+    cbdQ.setRPY(0, 0, atan2(psdP.y, psdP.x));
     odomQ.setW(odomP.pose.orientation.w);
     odomQ.setX(odomP.pose.orientation.x);
     odomQ.setY(odomP.pose.orientation.y);
@@ -267,10 +269,10 @@ bool Control::findBall(void) {
 
     r = sqrt(psdP.x * psdP.x + psdP.y * psdP.y);
 
-    if (r > 7) {
-      robotState = 3;
-      break;
-    }
+    // if (r > 7) {
+    //   robotState = 3;
+    //   break;
+    // }
 
     if (r > 2.5)
       r -= 1;
