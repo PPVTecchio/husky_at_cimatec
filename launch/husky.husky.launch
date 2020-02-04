@@ -13,7 +13,7 @@
     <arg name="urdf_extras" value="$(arg urdf_extras)"/>
     <arg name="x" value="49.5"/>
     <arg name="y" value="10"/>
-    <arg name="z" value="0.5"/>
+    <arg name="z" value="0.1"/>
     <arg name="yaw" value="3.14159"/>
   </include>
 

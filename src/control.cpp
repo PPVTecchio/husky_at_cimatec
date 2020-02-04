@@ -168,6 +168,8 @@ bool Control::findBall(void) {
       ROS_INFO_STREAM("Robot found ball using CBD!");
       robotState = 2;
     }
+    // if (psdState)
+    //   robotS
     break;
   case 2:
     if (explorationState) {
@@ -191,10 +193,16 @@ bool Control::findBall(void) {
     outputHeaderMsg.stamp = ros::Time::now();
     outputHeaderMsg.frame_id = odomH.frame_id;
 
-    if (cbdP.z > 0)
-      cbdP.z = std::min(cbdP.z, M_PI * 15/180);
-    else
-      cbdP.z = std::max(cbdP.z, - M_PI * 15/180);
+    // if (cbdP.z > 0)
+    //   cbdP.z = std::min(cbdP.z, M_PI * 15/180);
+    // else
+    //   cbdP.z = std::max(cbdP.z, - M_PI * 15/180);
+
+    // if (abs(cbdP.z) > M_PI * 15 / 180) {
+    //   robotState = 1;
+    //   startExploration();
+    //   break;
+    // }
 
     cbdQ.setRPY(0, 0, cbdP.z);
     odomQ.setW(odomP.pose.orientation.w);
