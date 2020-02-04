@@ -144,6 +144,7 @@ bool Control::findBall(void) {
   tf::Quaternion q;
   tf::Matrix3x3* m;
   double roll, pitch, yaw, r;
+  double alpha = 0;
 
 
   switch (robotState) {
@@ -195,8 +196,10 @@ bool Control::findBall(void) {
     m = new tf::Matrix3x3(q);
     m->getRPY(roll, pitch, yaw);
 
-    x = odomP.pose.position.x + 2 * cos(yaw);
-    y = odomP.pose.position.y + 2 * sin(yaw);
+    alpha = (0.25 - cbdP.x) / 0.25;
+
+    x = odomP.pose.position.x + alpha * 1 * cos(yaw);
+    y = odomP.pose.position.y + alpha * 1 * sin(yaw);
 
     outputPoseStampedMsg.header = outputHeaderMsg;
     outputPoseStampedMsg.pose.position.x = x;
@@ -211,10 +214,15 @@ bool Control::findBall(void) {
 
     ROS_INFO_STREAM("Goal msg: " << outputPoseStampedMsg);
 
-    if (psdState)
-      robotState = 4;
+    if (cbdP.x > 0.3)
+      robotState = 5;
     else
       robotState = 3;
+
+    // if (psdState)
+    //   robotState = 4;
+    // else
+    //   robotState = 3;
     break;
   case 4:
     ROS_INFO_STREAM("Robot PSD moving robot!");
