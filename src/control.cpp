@@ -85,7 +85,6 @@ Control::Control() {
   explorationState = false;
 
   robotState = 0;
-
 }
 
 Control::~Control() {
