@@ -23,16 +23,16 @@
   <include file="$(find husky)/launch/pc2ls.husky.launch" />
 
 
-  <include file="$(find husky)/launch/move_base.husky.launch">
+  <!-- <include file="$(find husky)/launch/move_base.husky.launch">
     <arg name="no_static_map" value="true"/>
-  </include>
+  </include> -->
 
   <include file="$(find husky)/launch/gmapping.husky.launch" />
 
   <include file="$(find husky)/launch/nav2d.husky.launch" />
 
-  <!-- <include file="$(find husky)/launch/cbd.husky.launch" /> -->
+  <include file="$(find husky)/launch/cbd.husky.launch" />
 
-  <!-- <include file="$(find husky)/launch/psd.husky.launch" /> -->
+  <include file="$(find husky)/launch/psd.husky.launch" />
 
 </launch>

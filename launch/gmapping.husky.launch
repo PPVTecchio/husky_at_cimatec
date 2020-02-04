@@ -21,10 +21,10 @@
       resampleThreshold: 0.5
 
       # Initial Map Size
-      xmin: -116.0
-      ymin: -55.0
-      xmax: 14.0
-      ymax: 35.0
+      xmin: -14.0
+      ymin: -35.0
+      xmax: 116.0
+      ymax: 55.0
       delta: 0.1
 
       # All default

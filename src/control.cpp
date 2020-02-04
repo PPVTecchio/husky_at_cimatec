@@ -1,7 +1,6 @@
 /*
  * COPYRIGHT Pedro Paulo Ventura Tecchio 2020
 */
-
 #include <ros/ros.h>
 #include <std_msgs/Header.h>
 #include <geometry_msgs/PointStamped.h>
@@ -18,7 +17,6 @@
 #include <nav2d_navigator/commands.h>
 
 #include <tf2/LinearMath/Quaternion.h>
-
 
 
 class Control {
@@ -194,6 +192,11 @@ bool Control::findBall(void) {
     outputHeaderMsg.stamp = ros::Time::now();
     outputHeaderMsg.frame_id = odomH.frame_id;
 
+    if (cbdP.z > 0)
+      cbdP.z = std::min(cbdP.z, M_PI * 15/180);
+    else
+      cbdP.z = std::max(cbdP.z, - M_PI * 15/180);
+
     cbdQ.setRPY(0, 0, cbdP.z);
     odomQ.setW(odomP.pose.orientation.w);
     odomQ.setX(odomP.pose.orientation.x);
@@ -262,7 +265,7 @@ bool Control::findBall(void) {
       break;
     }
 
-    if (r > 2)
+    if (r > 2.5)
       r -= 1;
 
     x = odomP.pose.position.x + r * cos(yaw);
@@ -277,7 +280,7 @@ bool Control::findBall(void) {
 
     ROS_INFO_STREAM("Goal msg: " << outputPoseStampedMsg);
 
-    if (r > 2)
+    if (r > 2.5)
       robotState = 4;
     else
       robotState = 5;
