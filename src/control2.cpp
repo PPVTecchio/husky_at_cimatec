@@ -176,7 +176,7 @@ bool Control::findBall(void) {
     break;
   case 3:
 
-    if (cbdP.z < 7) {  // check if it is near enough the ball to use psd
+    if (cbdP.z < 4) {  // check if it is near enough the ball to use psd
       robotState = 5;
       break;
     }
@@ -234,10 +234,7 @@ bool Control::findBall(void) {
     break;
 
   case 6:
-    if ((ros::Time::now().toSec() - oldTime.toSec()) < 10) {
-      break;
-    } else {
-      if (psdPv.size() > 1) {
+      if (psdPv.size() > 10) {
         x = 0;
         y = 0;
         for (int i = 0; i < psdPv.size(); i++) {
@@ -250,9 +247,9 @@ bool Control::findBall(void) {
         y /= psdPv.size();
         robotState = 8;
       } else {
-        robotState = 0;
+        robotState = 6;
       }
-    }
+
 
     break;
 
@@ -295,7 +292,10 @@ bool Control::findBall(void) {
     outputPoseStampedMsg.pose.position.x = x;
     outputPoseStampedMsg.pose.position.y = y;
     outputPoseStampedMsg.pose.position.z = odomP.pose.position.z;
-    outputPoseStampedMsg.pose.orientation = odomP.pose.orientation;
+    outputPoseStampedMsg.pose.orientation.w = q.getW();
+    outputPoseStampedMsg.pose.orientation.x = q.getX();
+    outputPoseStampedMsg.pose.orientation.y = q.getY();
+    outputPoseStampedMsg.pose.orientation.z = q.getZ();
     pubPoseStamped.publish(outputPoseStampedMsg);
 
     robotState = 9;
