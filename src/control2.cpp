@@ -31,6 +31,7 @@ class Control {
   bool psdState;
   bool explorationState;
   int robotState;
+  double fuck_x, fuck_y;
   ros::ServiceClient stopClient;
   ros::ServiceClient startClient;
   std_srvs::Trigger trigger;
@@ -235,20 +236,22 @@ bool Control::findBall(void) {
 
   case 6:
       if (psdPv.size() > 10) {
-        x = 0;
-        y = 0;
+        fuck_x = 0;
+        fuck_y = 0;
         for (int i = 0; i < psdPv.size(); i++) {
           // x = 0.7*x + 0.3*psdPv[i].x;
           // y = 0.7*y + 0.3*psdPv[i].y;
-          x += psdPv[i].x;
-          y += psdPv[i].y;
+          fuck_x += psdPv[i].x;
+          fuck_y += psdPv[i].y;
         }
-        x /= psdPv.size();
-        y /= psdPv.size();
+        fuck_x /= psdPv.size();
+        fuck_y /= psdPv.size();
         robotState = 8;
       } else {
         robotState = 6;
       }
+
+
 
 
     break;
@@ -267,12 +270,16 @@ bool Control::findBall(void) {
     outputHeaderMsg.stamp = ros::Time::now();
     outputHeaderMsg.frame_id = odomH.frame_id;
 
-    r = sqrt(std::pow(x, 2) + std::pow(y, 2));
-    yaw = atan2(y, x);
+    ROS_INFO_STREAM("x: " << fuck_x << " y: " << fuck_y);
 
-    r -= 1.5;
-    if (r < 1.5)
-      r = 0;
+    r = sqrt(std::pow(fuck_x, 2) + std::pow(fuck_y, 2));
+    yaw = atan2(fuck_y, fuck_x);
+
+    if (r > 1.5)
+      r -= 1.5;
+
+
+    ROS_INFO_STREAM("r: " << r);
 
     cbdQ.setRPY(0, 0, yaw);
     odomQ.setW(odomP.pose.orientation.w);
@@ -284,6 +291,7 @@ bool Control::findBall(void) {
 
     m = new tf::Matrix3x3(q);
     m->getRPY(roll, pitch, yaw);
+    ROS_INFO_STREAM("yaw: " << yaw * 180 / M_PI);
 
     x = odomP.pose.position.x + r * cos(yaw);
     y = odomP.pose.position.y + r * sin(yaw);
