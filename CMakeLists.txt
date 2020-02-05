@@ -22,3 +22,6 @@ include_directories(
 
 add_executable(control src/control.cpp)
 target_link_libraries(control ${catkin_LIBRARIES})
+
+add_executable(control2 src/control2.cpp)
+target_link_libraries(control2 ${catkin_LIBRARIES})
