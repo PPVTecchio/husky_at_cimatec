@@ -277,6 +277,9 @@ bool Control::findBall(void) {
 
     if (r > 1.5)
       r -= 1.5;
+    else
+      r = 0;
+
 
 
     ROS_INFO_STREAM("r: " << r);
