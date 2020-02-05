@@ -229,8 +229,8 @@ bool Control::findBall(void) {
 
     r = sqrt(psdP.x * psdP.x + psdP.y * psdP.y);
 
-    r -= 1.5;
-    if (r < 1.5)
+    r -= 2;
+    if (r < 2)
       r = 0;
 
     x = odomP.pose.position.x + r * cos(yaw);
